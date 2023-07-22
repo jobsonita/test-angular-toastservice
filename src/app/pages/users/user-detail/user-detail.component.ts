@@ -14,6 +14,7 @@ import { UsersService } from 'src/app/services/users.service';
 export class UserDetailComponent implements OnInit, OnDestroy {
 
   user!: User;
+  originalUser?: User;
   processing = false;
 
   private subscriptions: Subscription[] = [];
@@ -26,6 +27,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.user = this.retrieveUserFromRouteResolution();
+    this.originalUser = { ...this.user };
   }
 
   private retrieveUserFromRouteResolution() {
@@ -50,7 +52,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         })
       ).subscribe(user => {
         this.processing = false;
-        this.user = user;
+        this.user = { ...user };
       });
 
       this.subscriptions.push(subscription);
@@ -72,7 +74,8 @@ export class UserDetailComponent implements OnInit, OnDestroy {
       })
     ).subscribe(user => {
       this.processing = false;
-      this.user = user;
+      this.user = { ...user };
+      this.originalUser = { ...user };
     });
 
     this.subscriptions.push(subscription);
@@ -98,6 +101,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   }
 
   cancelEdit(): void {
+    this.processing = true;
     this.location.back();
   }
 

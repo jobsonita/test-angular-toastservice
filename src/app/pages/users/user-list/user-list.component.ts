@@ -26,6 +26,7 @@ export class UserListComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    this.processing = true;
     this.terms = this.retrieveLatestSearchTermFromQueryParams();
     this.subscribeToRetrieveUserListFromRouteResolution();
     this.subscribeToNavigateOnSearchTermsChanges(this.terms);
@@ -36,9 +37,10 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   private subscribeToRetrieveUserListFromRouteResolution() {
-    let subscription = this.routeService.data.subscribe(
-      data => this.users = data['users']
-    );
+    let subscription = this.routeService.data.subscribe(data => {
+      this.users = data['users'];
+      this.processing = false;
+    });
 
     this.subscriptions.push(subscription);
   }
@@ -48,9 +50,12 @@ export class UserListComponent implements OnInit, OnDestroy {
       startWith(initialTerms),
       debounceTime(1000),
       distinctUntilChanged()
-    ).subscribe(
-      terms => this.router.navigate([''], { queryParams: { search: terms } })
-    );
+    ).subscribe(terms => {
+      this.processing = true;
+      this.router.navigate([''], { queryParams: { search: terms } }).then(
+        () => this.processing = false
+      )
+    });
 
     this.subscriptions.push(subscription);
   }
@@ -76,6 +81,11 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   searchUser(term: string): void {
     this.searchTerms.next(term);
+  }
+
+  clearSearchField(): void {
+    this.terms = '';
+    this.searchTerms.next(this.terms);
   }
 
 }
