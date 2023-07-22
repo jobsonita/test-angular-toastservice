@@ -1,0 +1,14 @@
+<label>
+  Search specific users:
+  <input #searchField type="text" [(ngModel)]="terms" (input)="searchUser(searchField.value)" />
+</label>
+
+<ul>
+  <li *ngFor="let user of users">
+    <a routerLink="{{user.id}}">{{ user.firstname }}</a>
+  </li>
+</ul>
+
+<a routerLink="new">Create a new user</a>
+
+<button (click)="refreshUserList()" [disabled]="processing">Refresh List</button>
