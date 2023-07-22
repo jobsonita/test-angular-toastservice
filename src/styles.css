@@ -1,1 +1,58 @@
 /* You can add global styles to this file, and also import other style files */
+
+:root {
+  color-scheme: dark light;
+
+  --white: #ffffff;
+  --gray-100: #e1e1e6;
+  --gray-300: #c4c4cc;
+  --gray-400: #8d8d99;
+  --gray-600: #323238;
+  --gray-700: #29292e;
+  --gray-800: #202024;
+  --gray-900: #121214;
+
+  --green-300: #00B37E;
+  --green-500: #00875f;
+
+  --red-500: #F75A68;
+
+  --color-nav: var(--gray-700);
+  --color-body: var(--gray-800);
+  --color-input: var(--gray-900);
+  --color-text: var(--gray-100);
+  --button-background: transparent;
+
+  @media (prefers-color-scheme: light) {
+    --color-nav: var(--gray-300);
+    --color-body: var(--gray-300);
+    --color-input: var(--gray-100);
+    --color-text: var(--gray-900);
+    --button-background: var(--gray-400);
+  }
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 87.5%;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+body,
+input,
+textarea,
+button {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+}

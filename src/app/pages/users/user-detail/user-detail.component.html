@@ -1,21 +1,22 @@
 <h2>{{ user.id ? "Edit User " + originalUser!.firstname : "New User" }}</h2>
+<button class="clear" *ngIf="!user.id" type="button" (click)="userForm.reset()" [disabled]="processing || userForm.pristine">Clear Form</button>
 
 <form #userForm="ngForm" (ngSubmit)="saveUser()" ngNativeValidate>
-  <label>
-    Firstname:
-    <input type="text" [(ngModel)]="user.firstname" name="firstname" required #firstname="ngModel" />
-    <span [hidden]="firstname.valid || firstname.pristine">Username is required.</span>
-  </label>
-  <label>
-    Lastname:
-    <input type="text" [(ngModel)]="user.lastname" name="lastname" required #lastname="ngModel" />
-    <span [hidden]="lastname.valid || lastname.pristine">Lastname is required.</span>
-  </label>
+  <div class="firstnameinputline">
+    <label for="firstname-input">Firstname:</label>
+    <input id="firstname-input" type="text" [(ngModel)]="user.firstname" name="firstname" required #firstname="ngModel" />
+    <span id="firstname-input-error" [hidden]="firstname.valid || firstname.pristine">Username is required.</span>
+  </div>
 
-  <button type="submit" [disabled]="processing || !userForm.form.valid">Save</button>
+  <div class="lastnameinputline">
+    <label for="lastname-input">Lastname:</label>
+    <input id="lastname-input" type="text" [(ngModel)]="user.lastname" name="lastname" required #lastname="ngModel" />
+    <span id="lasname-input-error" [hidden]="lastname.valid || lastname.pristine">Lastname is required.</span>
+  </div>
+
+  <button class="cancel" type="button" (click)="cancelEdit()" [disabled]="processing">Cancel</button>
+  <button class="save" type="submit" [disabled]="processing || !userForm.form.valid">Save</button>
 </form>
 
-<button *ngIf="user.id" type="button" (click)="refreshUser()" [disabled]="processing">Refresh User</button>
-<button *ngIf="user.id" type="button" (click)="deleteUser()" [disabled]="processing">Delete User</button>
-<button *ngIf="!user.id" type="button" (click)="userForm.reset()" [disabled]="processing">Clear Form</button>
-<button type="button" (click)="cancelEdit()" [disabled]="processing">Cancel</button>
+<button class="refresh" *ngIf="user.id" type="button" (click)="refreshUser()" [disabled]="processing">Refresh User</button>
+<button class="delete" *ngIf="user.id" type="button" (click)="deleteUser()" [disabled]="processing">Delete User</button>

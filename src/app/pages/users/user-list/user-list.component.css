@@ -1,0 +1,148 @@
+:host {
+  margin: 0 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: 0.5fr 4fr 0.5fr;
+  grid-template-areas:
+    "label label input input clear clear"
+    "list list list list list list"
+    "refresh refresh refresh new new new";
+  gap: 1rem;
+  align-items: center;
+
+  background-color: var(--color-body);
+  height: calc(100vh - 8rem);
+}
+
+label {
+  grid-area: label;
+  justify-self: end;
+  font-size: 1.3rem;
+}
+
+input {
+  grid-area: input;
+  display: flex;
+  flex: 1;
+  background: var(--color-input);
+  border: 0;
+  padding: 0.25rem 0.75rem;
+  height: 2rem;
+  border-radius: 8px;
+  color: var(--color-text);
+  line-height: 2;
+}
+
+ul {
+  grid-area: list;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 1rem 0.5rem;
+}
+
+ul li {
+  justify-self: center;
+  list-style-type: none;
+  font-size: 1.5rem;
+}
+
+ul li a {
+  font-weight: bold;
+  color: var(--green-500);
+  text-decoration: none;
+}
+
+ul li a:hover {
+  color: var(--green-300);
+}
+
+:host > a {
+  grid-area: new;
+  justify-self: center;
+  color: var(--green-500);
+  font-weight: bold;
+  font-size: 1.5rem;
+  text-decoration: none;
+}
+
+:host > a:hover {
+  color: var(--green-300);
+}
+
+:host > button {
+  cursor: pointer;
+  background: var(--button-background);
+  color: var(--green-500);
+  font-size: 1.5rem;
+  border: 1px solid var(--green-500);
+  border-radius: 8px;
+  height: 3rem;
+  display: flex;
+  width: 100%;
+  max-width: 20rem;
+  justify-self: center;
+  font-weight: bold;
+  text-decoration: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: color 0.1s, background-color 0.1s;
+}
+
+:host > button:hover {
+  background: var(--green-500);
+  color: var(--white);
+}
+
+:host > button:disabled {
+  background: var(--gray-300);
+  color: var(--gray-400);
+  border-color: var(--gray-400);
+}
+
+.refresh {
+  grid-area: refresh;
+}
+
+.clear {
+  grid-area: clear;
+}
+
+@media (max-width: 768px) {
+  :host {
+    gap: 0.25rem;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 0.5fr 0.5fr 0.5fr repeat(8, 1fr) 0.5fr;
+    grid-template-areas:
+      "label label"
+      "input input"
+      "clear clear"
+      "list list"
+      "list list"
+      "list list"
+      "list list"
+      "list list"
+      "list list"
+      "list list"
+      "list list"
+      "refresh new";
+    height: fit-content;
+  }
+
+  label {
+    justify-self: center;
+  }
+
+  ul {
+    padding-top: 1rem;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(16, 1fr);
+  }
+}

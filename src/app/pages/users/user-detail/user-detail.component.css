@@ -1,0 +1,254 @@
+:host {
+  margin: 0 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  grid-template-areas:
+    "title title title clear clear clear"
+    "userform userform userform userform userform userform"
+    "userform userform userform userform userform userform"
+    "userform userform userform userform userform userform"
+    "refresh refresh refresh delete delete delete";
+  gap: 1rem;
+  align-items: center;
+
+  background-color: var(--color-body);
+  height: calc(100vh - 8rem);
+}
+
+h2 {
+  grid-area: title;
+  font-size: 1.5rem;
+  margin-left: 1.5rem;
+}
+
+form {
+  width: 100%;
+  height: 100%;
+  grid-area: userform;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  grid-template-areas:
+    "fninputl fninputl fninputl fninputl fninputl fninputl"
+    "lninputl lninputl lninputl lninputl lninputl lninputl"
+    "cancel cancel cancel save save save";
+  gap: 1rem;
+  align-items: center;
+}
+
+label {
+  justify-self: end;
+  align-items: center;
+  font-size: 1.3rem;
+}
+
+input {
+  display: flex;
+  flex: 1;
+  background: var(--color-input);
+  border: 0;
+  padding: 0.25rem 0.75rem;
+  height: 2rem;
+  border-radius: 8px;
+  color: var(--color-text);
+  line-height: 2;
+}
+
+input.ng-invalid:not(.ng-pristine) {
+  border: 1px solid red;
+}
+
+span {
+  align-items: center;
+  font-size: 0.9rem;
+  color: red;
+}
+
+button {
+  cursor: pointer;
+  background: var(--button-background);
+  color: var(--green-500);
+  font-size: 1.5rem;
+  border: 1px solid var(--green-500);
+  border-radius: 8px;
+  height: 3rem;
+  display: flex;
+  width: 100%;
+  max-width: 20rem;
+  justify-self: center;
+  font-weight: bold;
+  text-decoration: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: color 0.1s, background-color 0.1s;
+}
+
+button:hover {
+  background: var(--green-500);
+  color: var(--white);
+}
+
+button:disabled {
+  background: var(--gray-300);
+  color: var(--gray-400);
+  border-color: var(--gray-400);
+}
+
+.firstnameinputline {
+  grid-area: fninputl;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: 1fr;
+  grid-template-areas:
+    "fninputlabel fninput fninput fninputerror fninputerror fninputerror";
+  gap: 1rem;
+  align-items: center;
+}
+
+.lastnameinputline {
+  grid-area: lninputl;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: 1fr;
+  grid-template-areas:
+    "lninputlabel lninput lninput lninputerror lninputerror lninputerror";
+  gap: 1rem;
+  align-items: center;
+}
+
+label[for="firstname-input"] {
+  grid-area: fninputlabel;
+}
+
+#firstname-input {
+  grid-area: fninput;
+}
+
+#firstname-input-error {
+  grid-area: fninputerror;
+}
+
+label[for="lastname-input"] {
+  grid-area: lninputlabel;
+}
+
+#lastname-input {
+  grid-area: lninput;
+}
+
+#lastname-input-error {
+  grid-area: lninputerror;
+}
+
+.save {
+  grid-area: save;
+}
+
+.refresh {
+  grid-area: refresh;
+}
+
+.refresh:not(:disabled) {
+  color: cyan;
+  border-color: cyan;
+}
+
+.refresh:hover:not(:disabled) {
+  background-color: var(--gray-600);
+}
+
+.delete {
+  grid-area: delete;
+}
+
+.delete:not(:disabled) {
+  color: red;
+  border-color: red;
+}
+
+.delete:hover:not(:disabled) {
+  background-color: var(--red-500);
+}
+
+.clear {
+  grid-area: clear;
+}
+
+.clear:not(:disabled) {
+  color: cyan;
+  border-color: cyan;
+}
+
+.clear:hover:not(:disabled) {
+  background-color: var(--gray-600);
+}
+
+.cancel {
+  grid-area: cancel;
+}
+
+.cancel:not(:disabled) {
+  color: yellow;
+  border-color: yellow;
+}
+
+.cancel:hover:not(:disabled) {
+  background-color: var(--gray-600);
+}
+
+@media (max-width: 768px) {
+  :host {
+    gap: 0.25rem;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr repeat(3, 1fr) 1fr;
+    grid-template-areas:
+      "title clear"
+      "userform userform"
+      "userform userform"
+      "userform userform"
+      "refresh delete";
+  }
+
+  form {
+    gap: 0.25rem;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-areas:
+      "fninputl fninputl fninputl fninputl"
+      "lninputl lninputl lninputl lninputl"
+      "cancel cancel save save";
+  }
+
+  .firstnameinputline {
+    gap: 0.25rem;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    grid-template-areas:
+      "fninputlabel fninput fninput fninput"
+      "fninputlabel fninputerror fninputerror fninputerror";
+  }
+
+  .lastnameinputline {
+    gap: 0.25rem;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    grid-template-areas:
+      "lninputlabel lninput lninput lninput"
+      "lninputlabel lninputerror lninputerror lninputerror";
+  }
+
+  label[for="firstname-input"] {
+    align-self: baseline;
+  }
+
+  label[for="lastname-input"] {
+    align-self: baseline;
+  }
+}
