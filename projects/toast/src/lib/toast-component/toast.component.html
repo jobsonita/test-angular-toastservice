@@ -1,0 +1,19 @@
+<div class="toast-list" [ngClass]="position">
+  <div *ngFor="let toast of toasts" class="toast-card">
+    <div *ngIf="toast.visible" class="toast">
+      <div class="toast-grid" [ngClass]="toast.type">
+        <div *ngIf="toast.type" class="img">
+          <img *ngIf="toast.type == 'success'" src="assets/icons/success.svg" width="70" />
+          <img *ngIf="toast.type == 'error'" src="assets/icons/error.svg" width="70" />
+          <img *ngIf="toast.type == 'warning'" src="assets/icons/warning.svg" width="70" />
+          <img *ngIf="toast.type == 'info'" src="assets/icons/info.svg" width="70" />
+        </div>
+
+        <div class="title">{{ toast.title }}</div>
+        <div class="message">{{ toast.message }}</div>
+
+        <button type="button" (click)="close(toast.id!)" class="close">X</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 
+import { ToastModule } from 'toast';
+
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './layout/header/header.component';
@@ -16,6 +18,7 @@ import { InMemoryDataService } from './services/in-memory-data.service';
   imports: [
     BrowserModule,
     HttpClientModule,
+    ToastModule.forRoot({ position: "top-right" }),
     AppRoutingModule,
     // The HttpClientInMemoryWebApiModule module intercepts HTTP requests
     // and returns simulated server responses.

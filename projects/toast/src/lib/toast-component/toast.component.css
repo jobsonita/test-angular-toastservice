@@ -1,0 +1,120 @@
+.toast-list {
+  z-index: 1000;
+  position: absolute;
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-left {
+  top: 2%;
+  left: 2%;
+}
+
+.top {
+  top: 2%;
+  left: 50%;
+}
+
+.top-right {
+  top: 2%;
+  right: 2%;
+}
+
+.left {
+  top: 50%;
+  left: 2%;
+}
+
+.center {
+  top: 50%;
+  left: 50%;
+}
+
+.right {
+  top: 50%;
+  right: 2%;
+}
+
+.bottom-left {
+  bottom: 2%;
+  left: 2%;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.bottom {
+  bottom: 2%;
+  left: 50%;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.bottom-right {
+  bottom: 2%;
+  right: 2%;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.toast-card + .toast-card {
+  margin-top: 1rem;
+}
+
+.toast {
+  background-color: grey;
+  width: 100%;
+}
+
+.toast .success {
+  background-color: green;
+}
+
+.toast .warning {
+  background-color: orange;
+  color: black;
+}
+
+.toast .error {
+  background-color: red;
+}
+
+.toast .info {
+  background-color: cyan;
+}
+
+.toast-grid {
+  display: grid;
+  grid-template-columns: 20% 70% 10%;
+  grid-template-rows: 50% 50%;
+  grid-template-areas:
+    'image title close'
+    'image message message';
+}
+
+.toast-grid .img {
+  grid-area: image;
+}
+
+.toast-grid .title {
+  grid-area: title;
+  padding: 5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toast-grid .message {
+  grid-area: message;
+  padding: 3px;
+  font-size: small;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.toast-grid .close {
+  grid-area: close;
+  align-self: center;
+  justify-self: center;
+  width: 30px;
+  height: 30px;
+}

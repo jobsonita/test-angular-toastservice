@@ -1,6 +1,6 @@
 <label for="search-field">Search specific users:</label>
 <input #searchField id="search-field" type="text" [(ngModel)]="terms" (input)="searchUser(searchField.value)" />
-<button class="clear" (click)="clearSearchField()" [disabled]="processing">Clear Search</button>
+<button type="button" class="clear" (click)="clearSearchField()" [disabled]="processing">Clear Search</button>
 
 <ul>
   <li *ngFor="let user of users">
@@ -8,6 +8,6 @@
   </li>
 </ul>
 
-<button class="refresh" (click)="refreshUserList()" [disabled]="processing">Refresh List</button>
+<button type="button" class="refresh" (click)="refreshUserList()" [disabled]="processing">Refresh List</button>
 
 <a routerLink="new">Create a new user</a>

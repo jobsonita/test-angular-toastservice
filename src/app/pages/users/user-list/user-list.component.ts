@@ -1,6 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, Subscription, catchError, debounceTime, distinctUntilChanged, of, startWith } from 'rxjs';
+import { Subject, Subscription, catchError, debounceTime, distinctUntilChanged, of, skip, startWith } from 'rxjs';
+
+import { ToastService, ToastType } from 'toast';
 
 import { User } from 'src/app/interfaces';
 import { UsersService } from 'src/app/services/users.service';
@@ -22,6 +24,7 @@ export class UserListComponent implements OnInit, OnDestroy {
   constructor(
     private routeService: ActivatedRoute,
     private router: Router,
+    private toastService: ToastService,
     private usersService: UsersService,
   ) { }
 
@@ -49,7 +52,8 @@ export class UserListComponent implements OnInit, OnDestroy {
     let subscription = this.searchTerms.pipe(
       startWith(initialTerms),
       debounceTime(1000),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      skip(1),
     ).subscribe(terms => {
       this.processing = true;
       this.router.navigate([''], { queryParams: { search: terms } }).then(
@@ -76,6 +80,12 @@ export class UserListComponent implements OnInit, OnDestroy {
     ).subscribe(users => {
       this.processing = false;
       this.users = users;
+      this.toastService.show({
+        title: "User Refresh",
+        message: "The list of users was refreshed!",
+        milliseconds: 4000,
+        type: ToastType.Info
+      });
     });
   }
 
