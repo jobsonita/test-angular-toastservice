@@ -41,7 +41,7 @@ export class UsersService {
 
   update(user: User): Observable<User> {
     const url = `${this.resourceUrl}/${user.id}`;
-    return this.http.put<User>(url, user, this.httpOptions)
+    return this.http.put<User>(url, user, this.httpOptions);
   }
 
   delete(id: number): Observable<any> {

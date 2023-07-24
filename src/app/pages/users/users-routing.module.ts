@@ -1,22 +1,21 @@
-import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 
-import { userDetailResolver, userListResolver } from './services/users.resolver';
+import { userDetailResolver } from './services/users.resolver';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserListComponent } from './user-list/user-list.component';
+
+import { User } from 'src/app/interfaces';
 
 const routes: Routes = [
   {
     path: '',
-    component: UserListComponent,
-    resolve: { users: userListResolver },
-    runGuardsAndResolvers: 'paramsOrQueryParamsChange'
+    component: UserListComponent
   },
   {
     path: 'new',
-    component: UserDetailComponent
+    component: UserDetailComponent,
+    resolve: { user: () => new User }
   },
   {
     path: ':id',
@@ -27,9 +26,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
-    CommonModule,
-    FormsModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
   ],
   exports: [RouterModule]
 })

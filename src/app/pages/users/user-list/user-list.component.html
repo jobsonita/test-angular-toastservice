@@ -1,13 +1,24 @@
-<label for="search-field">Search specific users:</label>
-<input #searchField id="search-field" type="text" [(ngModel)]="terms" (input)="searchUser(searchField.value)" />
-<button type="button" class="clear" (click)="clearSearchField()" [disabled]="processing">Clear Search</button>
+<div *ngIf="users$ | withLoading:errorToast | async as users">
+  <label for="search-field">Search specific users:</label>
+  <input #searchField id="search-field" type="text" [(ngModel)]="terms" (input)="searchUser(searchField.value)" />
+  <button type="button" class="clear" (click)="clearSearchField()" [disabled]="users.loading">Clear Search</button>
 
-<ul>
-  <li *ngFor="let user of users">
-    <a routerLink="{{user.id}}">{{ user.firstname }}</a>
-  </li>
-</ul>
+  <ng-template [ngIf]="users.data">
+    <ul>
+      <li *ngFor="let user of users.data">
+        <a routerLink="{{user.id}}">{{ user.firstname }}</a>
+      </li>
+    </ul>
+  </ng-template>
 
-<button type="button" class="refresh" (click)="refreshUserList()" [disabled]="processing">Refresh List</button>
+  <ng-template [ngIf]="users.loading">
+    <span>Loading user list...</span>
+  </ng-template>
 
-<a routerLink="new">Create a new user</a>
+  <ng-template [ngIf]="users.error">
+    <span>Unable to load user list</span>
+  </ng-template>
+
+  <button type="button" class="refresh" (click)="refreshUserList()" [disabled]="users.loading">Refresh List</button>
+  <a routerLink="new">Create a new user</a>
+</div>

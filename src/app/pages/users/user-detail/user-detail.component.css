@@ -1,4 +1,4 @@
-:host {
+:host > div {
   margin: 0 0.5rem;
   padding: 0.5rem 1rem;
   border-radius: 1rem;
@@ -17,6 +17,12 @@
 
   background-color: var(--color-body);
   height: calc(100vh - 8rem);
+}
+
+:host > div > span {
+  grid-area: userform;
+  align-self: center;
+  justify-self: center;
 }
 
 h2 {
@@ -62,7 +68,7 @@ input.ng-invalid:not(.ng-pristine) {
   border: 1px solid red;
 }
 
-span {
+form > span {
   align-items: center;
   font-size: 0.9rem;
   color: red;
@@ -204,7 +210,7 @@ label[for="lastname-input"] {
 }
 
 @media (max-width: 768px) {
-  :host {
+  :host > div {
     gap: 0.25rem;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr repeat(3, 1fr) 1fr;

@@ -1,8 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, Subscription, catchError, debounceTime, distinctUntilChanged, of, skip, startWith } from 'rxjs';
-
-import { ToastService, ToastType } from 'toast';
+import { Observable, Subject, Subscription, debounceTime, of, tap } from 'rxjs';
 
 import { User } from 'src/app/interfaces';
 import { UsersService } from 'src/app/services/users.service';
@@ -14,88 +12,61 @@ import { UsersService } from 'src/app/services/users.service';
 })
 export class UserListComponent implements OnInit, OnDestroy {
 
+  errorToast = { title: 'User list', message: 'Unable to retrieve user list' };
+
   terms = '';
-  users: User[] = [];
-  processing = false;
+  users$: Observable<User[]> = of([]);
 
   private searchTerms = new Subject<string>();
-  private subscriptions: Subscription[] = [];
+  private subscription?: Subscription;
 
   constructor(
     private routeService: ActivatedRoute,
     private router: Router,
-    private toastService: ToastService,
     private usersService: UsersService,
   ) { }
 
   ngOnInit(): void {
-    this.processing = true;
-    this.terms = this.retrieveLatestSearchTermFromQueryParams();
-    this.subscribeToRetrieveUserListFromRouteResolution();
-    this.subscribeToNavigateOnSearchTermsChanges(this.terms);
+    this.retrieveLatestSearchTermsFromQueryParams();
+    this.loadUserList();
+    this.pipeUserListFromSearchTermsChanges();
   }
 
-  private retrieveLatestSearchTermFromQueryParams() {
-    return this.routeService.snapshot.queryParams['search'] ?? '';
+  private retrieveLatestSearchTermsFromQueryParams() {
+    this.terms = this.routeService.snapshot.queryParams['search'] ?? '';
   }
 
-  private subscribeToRetrieveUserListFromRouteResolution() {
-    let subscription = this.routeService.data.subscribe(data => {
-      this.users = data['users'];
-      this.processing = false;
-    });
-
-    this.subscriptions.push(subscription);
+  private loadUserList() {
+    this.users$ = this.usersService.list({ search: this.terms });
   }
 
-  private subscribeToNavigateOnSearchTermsChanges(initialTerms: string) {
-    let subscription = this.searchTerms.pipe(
-      startWith(initialTerms),
-      debounceTime(1000),
-      distinctUntilChanged(),
-      skip(1),
+  private pipeUserListFromSearchTermsChanges() {
+    this.subscription = this.searchTerms.pipe(
+      debounceTime(1000)
     ).subscribe(terms => {
-      this.processing = true;
-      this.router.navigate([''], { queryParams: { search: terms } }).then(
-        () => this.processing = false
-      )
+      this.users$ = this.usersService.list({ search: terms }).pipe(
+        tap(() => this.router.navigate(['users'], { queryParams: { search: terms } }))
+      );
     });
-
-    this.subscriptions.push(subscription);
   }
 
   ngOnDestroy(): void {
-    this.processing = false;
-    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.subscription?.unsubscribe();
+  }
+
+  searchUser(terms: string): void {
+    this.searchTerms.next(terms);
   }
 
   refreshUserList(): void {
-    this.processing = true;
-    this.usersService.list({ search: this.terms }).pipe(
-      catchError(error => {
-        console.error(error);
-        this.processing = false;
-        return of([]);
-      })
-    ).subscribe(users => {
-      this.processing = false;
-      this.users = users;
-      this.toastService.show({
-        title: "User Refresh",
-        message: "The list of users was refreshed!",
-        milliseconds: 4000,
-        type: ToastType.Info
-      });
-    });
-  }
-
-  searchUser(term: string): void {
-    this.searchTerms.next(term);
+    this.searchUser(this.terms);
   }
 
   clearSearchField(): void {
-    this.terms = '';
-    this.searchTerms.next(this.terms);
+    if (this.terms) {
+      this.terms = '';
+      this.refreshUserList();
+    }
   }
 
 }

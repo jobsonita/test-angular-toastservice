@@ -1,7 +1,9 @@
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Subscription, catchError, of } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable, catchError, of, switchMap, tap } from 'rxjs';
+
+import { ToastService, ToastType } from 'toast';
 
 import { User } from 'src/app/interfaces';
 import { UsersService } from 'src/app/services/users.service';
@@ -11,97 +13,122 @@ import { UsersService } from 'src/app/services/users.service';
   templateUrl: './user-detail.component.html',
   styleUrls: ['./user-detail.component.css']
 })
-export class UserDetailComponent implements OnInit, OnDestroy {
+export class UserDetailComponent implements OnInit {
 
-  user!: User;
-  originalUser?: User;
-  processing = false;
+  errorToast = { title: 'User', message: 'Unable to perform operation on user data' };
+  operation = "Loading user data...";
 
-  private subscriptions: Subscription[] = [];
+  user$!: Observable<User>;
 
   constructor(
     private routeService: ActivatedRoute,
     private location: Location,
+    private router: Router,
+    private toastService: ToastService,
     private usersService: UsersService,
   ) { }
 
   ngOnInit(): void {
-    this.user = this.retrieveUserFromRouteResolution();
-    this.originalUser = { ...this.user };
+    this.retrieveUserFromRouteResolution();
   }
 
   private retrieveUserFromRouteResolution() {
-    return this.routeService.snapshot.data['user'] ?? new User;
+    this.user$ = this.routeService.data.pipe(
+      switchMap(data => of(data['user']))
+    );
   }
 
-  ngOnDestroy(): void {
-    this.processing = false;
-    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  refreshUser(id: number): void {
+    this.operation = "Refreshing user data...";
+    this.user$ = this.usersService.retrieve(id);
   }
 
-  refreshUser(): void {
-    const id = this.user?.id;
-    if (id) {
-      this.processing = true;
-
-      const subscription = this.usersService.retrieve(id).pipe(
-        catchError(error => {
-          console.error(error);
-          this.processing = false;
-          return of(this.user);
-        })
-      ).subscribe(user => {
-        this.processing = false;
-        this.user = { ...user };
-      });
-
-      this.subscriptions.push(subscription);
+  saveUser(user: User): void {
+    if (user?.id) {
+      this.updateUser(user);
+    } else {
+      this.createUser(user);
     }
   }
 
-  saveUser(): void {
-    this.processing = true;
-    const id = this.user?.id;
-    const operation = id
-      ? this.usersService.update(this.user)
-      : this.usersService.create(this.user);
+  private updateUser(user: User) {
+    this.operation = "Updating user...";
+    this.user$ = this.usersService.update(user).pipe(
 
-    const subscription = operation.pipe(
-      catchError(error => {
-        console.error(error);
-        this.processing = false;
-        return of(this.user);
+      tap(() => this.toastService.show({
+        title: `User updated`,
+        message: `${user.firstname} ${user.lastname} updated with success`,
+        type: ToastType.Success
+      })),
+
+      catchError(() => {
+        this.toastService.show({
+          title: `User update failed`,
+          message: `Failed to update user ${user.firstname} ${user.lastname}`,
+          type: ToastType.Error
+        });
+        return of(user);
       })
-    ).subscribe(user => {
-      this.processing = false;
-      this.user = { ...user };
-      this.originalUser = { ...user };
-    });
 
-    this.subscriptions.push(subscription);
+    );
   }
 
-  deleteUser(): void {
-    const id = this.user?.id;
-    if (id) {
-      this.processing = true;
+  private createUser(user: User) {
+    this.operation = "Creating user...";
+    this.user$ = this.usersService.create(user).pipe(
 
-      const subscription = this.usersService.delete(id).pipe(
-        catchError(error => {
-          console.error(error);
-          this.processing = false;
-          return of(this.user);
-        })
-      ).subscribe(() => {
-        this.location.back();
-      });
+      tap((createdUser) => {
+        this.toastService.show({
+          title: 'User created',
+          message: `${user.firstname} ${user.lastname} created with success`,
+          type: ToastType.Success
+        });
+        this.router.navigate(['users', createdUser.id]);
+      }),
 
-      this.subscriptions.push(subscription);
-    }
+      catchError(() => {
+        this.toastService.show({
+          title: `User creation failed`,
+          message: `Failed to create user ${user.firstname} ${user.lastname}`,
+          type: ToastType.Error
+        });
+        return of(user);
+      })
+
+    );
+  }
+
+  deleteUser(user: User): void {
+    this.operation = "Deleting user...";
+    this.user$ = this.usersService.delete(user.id!).pipe(
+
+      tap(() => {
+        this.toastService.show({
+          title: 'User deleted',
+          message: `User ${user.firstname} ${user.lastname} was deleted with success`,
+          type: ToastType.Success
+        });
+        this.router.navigate(['users']);
+      }),
+      switchMap(() => of(new User)),
+
+      catchError(() => {
+        this.toastService.show({
+          title: `User deletion failed`,
+          message: `Failed to delete user ${user.firstname} ${user.lastname}`,
+          type: ToastType.Error
+        });
+        return of(user);
+      })
+
+    );
   }
 
   cancelEdit(): void {
-    this.processing = true;
+    this.returnToPreviousPage();
+  }
+
+  private returnToPreviousPage() {
     this.location.back();
   }
 
