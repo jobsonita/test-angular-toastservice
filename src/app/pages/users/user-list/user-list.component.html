@@ -1,6 +1,6 @@
 <div *ngIf="users$ | withLoading:errorToast | async as users">
   <label for="search-field">Search specific users:</label>
-  <input #searchField id="search-field" type="text" [(ngModel)]="terms" (input)="searchUser(searchField.value)" />
+  <input id="search-field" type="text" [formControl]="searchField" />
   <button type="button" class="clear" (click)="clearSearchField()" [disabled]="users.loading">Clear Search</button>
 
   <ng-template [ngIf]="users.data">

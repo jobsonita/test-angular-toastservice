@@ -1,7 +1,8 @@
 import { Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, catchError, of, switchMap, tap } from 'rxjs';
+import { Observable, Subject, Subscription, catchError, map, of, switchMap, tap } from 'rxjs';
 
 import { ToastService, ToastType } from 'toast';
 
@@ -13,45 +14,71 @@ import { UsersService } from 'src/app/services/users.service';
   templateUrl: './user-detail.component.html',
   styleUrls: ['./user-detail.component.css']
 })
-export class UserDetailComponent implements OnInit {
+export class UserDetailComponent implements OnInit, OnDestroy {
 
   errorToast = { title: 'User', message: 'Unable to perform operation on user data' };
   operation = "Loading user data...";
 
   user$!: Observable<User>;
+  latestUser$ = new Subject<User>();
+
+  userForm!: FormGroup;
+
+  private subscription?: Subscription;
 
   constructor(
     private routeService: ActivatedRoute,
     private location: Location,
     private router: Router,
+    private formBuilder: FormBuilder,
     private toastService: ToastService,
     private usersService: UsersService,
   ) { }
 
   ngOnInit(): void {
+    this.createFormAndSubscribeToLatestUserChanges();
     this.retrieveUserFromRouteResolution();
+  }
+
+  private createFormAndSubscribeToLatestUserChanges() {
+    this.subscription = this.latestUser$.subscribe(user => {
+      this.userForm = this.formBuilder.group({
+        id: [user.id],
+        firstname: [user.firstname, Validators.required],
+        lastname: [user.lastname, Validators.required],
+      });
+    });
   }
 
   private retrieveUserFromRouteResolution() {
     this.user$ = this.routeService.data.pipe(
-      switchMap(data => of(data['user']))
+      map(data => data['user']),
+      tap(user => this.latestUser$.next(user))
     );
   }
 
-  refreshUser(id: number): void {
-    this.operation = "Refreshing user data...";
-    this.user$ = this.usersService.retrieve(id);
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
-  saveUser(user: User): void {
-    if (user?.id) {
-      this.updateUser(user);
+  refreshUser(): void {
+    const id = this.userForm.value.id;
+    this.operation = "Refreshing user data...";
+    this.user$ = this.usersService.retrieve(id).pipe(
+      tap(user => this.latestUser$.next(user))
+    );
+  }
+
+  saveUser(): void {
+    if (this.userForm.value.id) {
+      this.updateUser();
     } else {
-      this.createUser(user);
+      this.createUser();
     }
   }
 
-  private updateUser(user: User) {
+  private updateUser() {
+    const user = this.userForm.value;
     this.operation = "Updating user...";
     this.user$ = this.usersService.update(user).pipe(
 
@@ -60,6 +87,7 @@ export class UserDetailComponent implements OnInit {
         message: `${user.firstname} ${user.lastname} updated with success`,
         type: ToastType.Success
       })),
+      tap(() => this.latestUser$.next(user)),
 
       catchError(() => {
         this.toastService.show({
@@ -73,7 +101,8 @@ export class UserDetailComponent implements OnInit {
     );
   }
 
-  private createUser(user: User) {
+  private createUser() {
+    const user = this.userForm.value;
     this.operation = "Creating user...";
     this.user$ = this.usersService.create(user).pipe(
 
@@ -85,6 +114,7 @@ export class UserDetailComponent implements OnInit {
         });
         this.router.navigate(['users', createdUser.id]);
       }),
+      tap((createdUser) => this.latestUser$.next(createdUser)),
 
       catchError(() => {
         this.toastService.show({
@@ -98,7 +128,8 @@ export class UserDetailComponent implements OnInit {
     );
   }
 
-  deleteUser(user: User): void {
+  deleteUser(): void {
+    const user = this.userForm.value;
     this.operation = "Deleting user...";
     this.user$ = this.usersService.delete(user.id!).pipe(
 
@@ -111,6 +142,7 @@ export class UserDetailComponent implements OnInit {
         this.router.navigate(['users']);
       }),
       switchMap(() => of(new User)),
+      tap((newUser) => this.latestUser$.next(newUser)),
 
       catchError(() => {
         this.toastService.show({
@@ -122,6 +154,10 @@ export class UserDetailComponent implements OnInit {
       })
 
     );
+  }
+
+  reset(): void {
+    this.userForm.reset();
   }
 
   cancelEdit(): void {

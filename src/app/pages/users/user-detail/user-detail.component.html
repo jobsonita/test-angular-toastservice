@@ -1,29 +1,37 @@
 <div *ngIf="user$ | withLoading:errorToast | async as user">
   <ng-template [ngIf]="user.data">
     <h2>{{ user.data.id ? "Edit User " + user.data.firstname : "New User" }}</h2>
-    <button class="clear" *ngIf="!user.data.id" type="button" (click)="userForm.reset()" [disabled]="userForm.pristine">Clear Form</button>
+    <button class="clear" *ngIf="!user.data.id" type="button" (click)="reset()" [disabled]="userForm.pristine">Clear Form</button>
 
-    <form #userForm="ngForm" (ngSubmit)="saveUser(userForm.value)" ngNativeValidate>
-      <input type="hidden" name="id" [ngModel]="user.data.id" />
+    <form [formGroup]="userForm" (submit)="saveUser()" novalidate>
+      <input type="hidden" formControlName="id" />
 
       <div class="firstnameinputline">
         <label for="firstname-input">Firstname:</label>
-        <input id="firstname-input" type="text" [ngModel]="user.data.firstname" name="firstname" required #firstname="ngModel" />
-        <span id="firstname-input-error" [hidden]="firstname.valid || firstname.pristine">Username is required.</span>
+        <input id="firstname-input" type="text" formControlName="firstname" />
+        <ng-template [ngIf]="userForm.controls['firstname'].errors && !userForm.controls['firstname'].pristine">
+          <ng-template [ngIf]="userForm.controls['firstname'].errors['required']">
+            <span id="firstname-input-error">Firstname is required.</span>
+          </ng-template>
+        </ng-template>
       </div>
 
       <div class="lastnameinputline">
         <label for="lastname-input">Lastname:</label>
-        <input id="lastname-input" type="text" [ngModel]="user.data.lastname" name="lastname" required #lastname="ngModel" />
-        <span id="lasname-input-error" [hidden]="lastname.valid || lastname.pristine">Lastname is required.</span>
+        <input id="lastname-input" type="text" formControlName="lastname" />
+        <ng-template [ngIf]="userForm.controls['lastname'].errors && !userForm.controls['lastname'].pristine">
+          <ng-template [ngIf]="userForm.controls['lastname'].errors['required']">
+            <span id="lastname-input-error">Lastname is required.</span>
+          </ng-template>
+        </ng-template>
       </div>
 
       <button class="cancel" type="button" (click)="cancelEdit()">Cancel</button>
-      <button class="save" type="submit" [disabled]="!userForm.form.valid">Save</button>
+      <button class="save" type="submit" [disabled]="!userForm.valid">Save</button>
     </form>
 
-    <button class="refresh" *ngIf="user.data.id" type="button" (click)="refreshUser(user.data.id)">Refresh User</button>
-    <button class="delete" *ngIf="user.data.id" type="button" (click)="deleteUser(user.data)">Delete User</button>
+    <button class="refresh" *ngIf="user.data.id" type="button" (click)="refreshUser()">Refresh User</button>
+    <button class="delete" *ngIf="user.data.id" type="button" (click)="deleteUser()">Delete User</button>
   </ng-template>
 
   <ng-template [ngIf]="user.loading">

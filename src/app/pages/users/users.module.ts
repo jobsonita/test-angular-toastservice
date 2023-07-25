@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { UsersService } from 'src/app/services/users.service';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -15,7 +15,7 @@ import { UsersRoutingModule } from './users-routing.module';
   ],
   imports: [
     SharedModule,
-    FormsModule,
+    ReactiveFormsModule,
     UsersRoutingModule,
   ],
   providers: [UsersService]
